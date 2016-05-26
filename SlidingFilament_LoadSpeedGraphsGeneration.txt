@@ -1,0 +1,35 @@
+listeforcevitesse = {};
+
+(*Simple Traction*)
+
+Module[{n = 2000,
+  initialpvector = {0.86, 0.14},
+  s, r1, p, f, t = 0, v},
+ Do[
+   s = Table[RandomReal[{-d0/2, d0/2}], {n}];
+   p = Table[RandomChoice[initialpvector -> {0, 1}], {n}];
+   f = p*s;
+   pathvector = Reap[Do[
+       Sow[{t, p, f, s}];
+       r1 = Table[RandomReal[], {n}];
+       p = 
+        p + (1 - p)*MapThread[Boole[#1 < #2] &, {r1, g[s, p]}] - 
+         p*MapThread[Boole[#1 >= #2] &, {r1, g[s, p]}]*
+          MapThread[Boole[#1 <= #2] &, {r1, r[s, p] + g[s, p]}];
+       s = (1 - p)*Mod[s + v \[CapitalDelta]t0, d0, -d0/2] + 
+         p*(s + v \[CapitalDelta]t0);
+       f = p*s;
+       t = t + \[CapitalDelta]t0;
+       , {Nrealisation + 1}];
+     ];
+   meanload = 
+    Table[{pathvector[[2, 1, i, 1]], Mean[pathvector[[2, 1, i, 3]]]}, {i, 
+      Nrealisation + 1}];
+   AppendTo[listeforcevitesse, averageloadextractor[meanload, 1, 3]];
+   , {v, 1, 100, 1}];
+ ]
+ listeforcevitesse=[Flatten@Riffle[Range[100], listeforcevitesse], 3];
+ ListPlot[Partition[
+  Riffle[Range[150], Transpose[listeforcevitesse][[1]]], 2], 
+ AxesLabel -> {Style["Vitesse", Medium, Red], 
+   Style["Force Stationnaire", Medium, Red]}]

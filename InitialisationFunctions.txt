@@ -12,6 +12,71 @@ g[s_, p_] := (1 - p)*\[CapitalDelta]t0*kon/2*
 \[ExponentialE]^(-0.5 xsurdelta^2),{xsurdelta,s/\[Delta]-0.5,s/\
 \[Delta]+0.5}]*)
 
+neighbourtest[criterion_] := 
+  Module[{n = 0}, 
+   While[(g[d0*(0.5 + n), 0]/g[0, 0]) > criterion, n++]; n];
+swrapped[s_] := Mod[s, d0, -d0/2];
+positionslistplus[s_] := Prepend[
+   Table[i*d0 - s
+    , {i, neighbourtest[neighbourcriterion]}
+    ]
+   , s];
+positionslistminus[s_] := Prepend[
+   Table[i*d0 + s
+    , {i, neighbourtest[neighbourcriterion] - 2}]
+   , Last[positionslistplus[s]]];
+attachmentfunctionplus[s_, p_] := 
+  If[neighbourtest[neighbourcriterion] > 1,
+   Total[
+    Table[
+      i*(1 - Unitize[p]), {i, 2, 
+       neighbourtest[neighbourcriterion] + 1}]*MapThread[
+      (MapThread[(Boole[#1 > #2]) &, {r1, #1}]*
+         MapThread[(Boole[#1 < #2]) &, {r1, #2}]) &
+      , Transpose[
+       Partition[
+        Accumulate[
+         Map[
+          g[#, p] &, positionslistplus[s]]
+         ]
+        , 2, 1]
+       ]
+      ]
+    ]
+   , 0];
+attachmentfunctionminus[s_, p_] := 
+  If[neighbourtest[neighbourcriterion] > 2,
+   Total[
+    Table[-i*(1 - Unitize[p]), {i, 1, 
+       neighbourtest[neighbourcriterion] - 2}]*MapThread[
+      (MapThread[(Boole[#1 > #2]) &, {r1, #1}]*
+         MapThread[(Boole[#1 < #2]) &, {r1, #2}]) &
+      , Transpose[
+       Partition[
+        Accumulate[
+         Map[
+          g[#, p] &, positionslistminus[s]]
+         ]
+        , 2, 1]
+       ]
+      ]
+    ]
+   , 0];
+cumulativeprob[s_, p_] := If[neighbourtest[neighbourcriterion] > 2,
+   Last[
+    Accumulate[
+     Map[
+      g[#, p] &, positionslistminus[s]]
+     ]
+    ]
+   , If[neighbourtest[neighbourcriterion] > 1,
+    Last[
+     Accumulate[
+      Map[
+       g[#, p] &, positionslistplus[s]]
+      ]
+     ], g[swrapped[s], p]]];
+
 trajectorybindingstate[x_] := 
   Table[{pathvector[[2, 1, i, 1]], pathvector[[2, 1, i, 2, x]]}, {i, 
     Nrealisation + 1}];

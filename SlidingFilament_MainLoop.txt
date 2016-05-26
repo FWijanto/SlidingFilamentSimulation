@@ -1,22 +1,51 @@
-Module[{n = 3000,
+Module[{n = 1000.,
   initialpvector = {0.86, 0.14},
   s, r1, p, f, t = 0},
  s = Table[RandomReal[{-d0/2, d0/2}], {n}];
  p = Table[RandomChoice[initialpvector -> {0, 1}], {n}];
- f = p*s;
+ f = Total[
+   (Table[1 - Unitize[p - i]
+       , {i, 
+        Table[i, {i, 2 - neighbourtest[neighbourcriterion], -1, 1}]~
+         Join~Table[i, {i, 2, neighbourtest[neighbourcriterion]}]}
+       ]*Table[-i*d0 + s
+       , {i, 
+        Table[i, {i, 2 - neighbourtest[neighbourcriterion], -1, 1}]~
+         Join~Table[i, {i, 2, neighbourtest[neighbourcriterion]}]}
+       ])~Join~{((1 - Unitize[p - 1])*s)}
+   ];
  pathvector = Reap[Do[
-     Sow[{t, p, f, s}];
+     Sow[{t, 
+       MapThread[(If[Negative[#1] == False, #1 + #2, 
+           If[#2 == 1, #1 + #2 - 1, #1 + #2]]) &, {Quotient[s, 
+          d0, -d0/2], p}], f}];
      r1 = Table[RandomReal[], {n}];
-     p = p + (1 - p)*MapThread[Boole[#1 < #2] &, {r1, g[s, p]}] - 
-       p*MapThread[Boole[#1 >= #2] &, {r1, g[s, p]}]*
-        MapThread[Boole[#1 <= #2] &, {r1, r[s, p] + g[s, p]}];
-     s = (1 - p)*Mod[s + v0 \[CapitalDelta]t0, d0, -d0/2] + 
-       p*(s + v0 \[CapitalDelta]t0);
-     f = p*s;
+     p = p + (1 - Unitize[p])*
+        MapThread[Boole[#1 < #2] &, {r1, g[swrapped[s], p]}] + 
+       attachmentfunctionplus[s, p] + attachmentfunctionminus[s, p] - 
+       p*MapThread[Boole[#1 >= #2] &, {r1, cumulativeprob[s, p]}]*
+        MapThread[
+         Boole[#1 <= #2] &, {r1, r[s, p] + cumulativeprob[s, p]}];
+     s = (1 - Unitize[p])*Mod[s + v0 \[CapitalDelta]t0, d0, -d0/2] + 
+       Unitize[p]*(s + v0 \[CapitalDelta]t0);
+     f = Total[
+       (Table[1 - Unitize[p - i]
+           , {i, 
+            Table[i, {i, 2 - neighbourtest[neighbourcriterion], -1, 
+               1}]~Join~
+             Table[i, {i, 2, neighbourtest[neighbourcriterion]}]}
+           ]*Table[-i*d0 + s
+           , {i, 
+            Table[i, {i, 2 - neighbourtest[neighbourcriterion], -1, 
+               1}]~Join~
+             Table[i, {i, 2, neighbourtest[neighbourcriterion]}]}
+           ])~Join~{((1 - Unitize[p - 1])*s)}
+       ];
      t = t + \[CapitalDelta]t0;
      , {Nrealisation + 1}];
    ];
  ]
+
 prescribeddisplacementlinear = 
   Table[i*\[CapitalDelta]t0*v0, {i, 0, Nrealisation + 1}];
 meanbindingstate = 

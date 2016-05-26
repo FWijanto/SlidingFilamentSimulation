@@ -1,36 +1,24 @@
-Nrealisation = 3000;
+Nrealisation = 1000.;
 (*\[Delta]=1;*)(*nm*)
 
-kon = 10;(*kon=Subscript[k, on]/(Subscript[k, off]E^-Subscript[U, \
+kon = 10.;(*kon=Subscript[k, on]/(Subscript[k, off]E^-Subscript[U, \
 0]), Subscript[k, off]=10^-3 Hz, Subscript[k, on]=10^-2 Hz*)
 
 timeconstant = 
-  1; (*timeconstant=Subscript[k, off]\[ExponentialE]^-Subscript[\
+  1.; (*timeconstant=Subscript[k, off]\[ExponentialE]^-Subscript[\
 \[Beta]U, 0]*)
 (*v=5;*) (*nm.s^-1*)
 
-v0 = 15;(*v0=v/(Subscript[k, off]\[ExponentialE]^-Subscript[\[Beta]U, \
-0] \[Delta]), v en nm.s^-1*)
-k0 = 10; (*k0=k/\[Kappa], k en pN.nm^-1*)
+v0 = 15.;(*v0=v/(Subscript[k, \
+off]\[ExponentialE]^-Subscript[\[Beta]U, 0] \[Delta]), v en nm.s^-1*)
+
+k0 = 10.; (*k0=k/\[Kappa], k en pN.nm^-1*)
 
 energyconstant = 
   2;(*energyconstant=\[Beta]\[Kappa]\[Delta]^2/2*)(*\[Beta]=4;*)
 
-d0 = 20; (*d0=d/\[Delta], d en nm*)
+d0 = 0.5; (*d0=d/\[Delta], d en nm*)
 \[CapitalDelta]t0 = 
   0.001; (*\[CapitalDelta]t0=\[Alpha]\[CapitalDelta]t, \
 \[CapitalDelta]t en s*)
-
-r[s_, p_] := 
- MapThread[
-  If[Abs[#1] <= (k0 + 1)/
-     2, #2*\[CapitalDelta]t0*2 E^(-(energyconstant/4))*
-     E^(-((energyconstant*#1^2)/(1 + k0)))*Cosh[#1*energyconstant], 
-    1] &, {s, p}](*k^-\[Times]\[CapitalDelta]t0*)
-
-g[s_, p_] := (1 - p)*\[CapitalDelta]t0*(kon/2)*
-  timeconstant*(Erf[(s + 0.5)*Sqrt[energyconstant]] - 
-    Erf[(s - 0.5)*Sqrt[
-      energyconstant]])(*k^+\[Times]\[CapitalDelta]t0*)(*Integrate[\
-\[ExponentialE]^(-0.5 xsurdelta^2),{xsurdelta,s/\[Delta]-0.5,
-  s/\[Delta]+0.5}]*)
+neighbourcriterion = 0.01;
