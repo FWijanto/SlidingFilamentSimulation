@@ -11,5 +11,6 @@ Current Situation
 -----------
 New functionalities are being added to allow binding to neighbours other than the nearest binding site.
 Currently, these functionalities have been added for the **main loop** only. Initialisation variables and functions are also updated along the way.
+The correctness of these features need to be tested.
 All other features are at the previous version which allow only binding on the nearest site.
 
