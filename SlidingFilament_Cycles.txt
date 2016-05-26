@@ -1,0 +1,72 @@
+Module[{n = 1000,
+  cycleamount = 6,
+  stretchdistance = 2*d0,
+  initialpvector = {0.78, 0.22},
+  s, r1, p, f, t = 0, cyclestate = 0},
+ s = Table[RandomReal[{-d0/2, d0/2}], {n}];
+ p = Table[RandomChoice[initialpvector -> {0, 1}], {n}];
+ f = p*s;
+ cyclepathvector = Reap[Do[
+     Which[
+      cyclestate == 0,
+      Do[
+       r1 = Table[RandomReal[], {n}];
+       p = 
+        p + (1 - p)*MapThread[Boole[#1 < #2] &, {r1, g[s, p]}] - 
+         p*MapThread[Boole[#1 >= #2] &, {r1, g[s, p]}]*
+          MapThread[Boole[#1 <= #2] &, {r1, r[s, p] + g[s, p]}];
+       s = (1 - p)*Mod[s + v0 \[CapitalDelta]t0, d0, -d0/2] + 
+         p*(s + v0 \[CapitalDelta]t0);
+       f = p*s;
+       t = t + \[CapitalDelta]t0;
+       Sow[{t, p, f, s}];
+       , {stretchdistance/(v0*\[CapitalDelta]t0)}];
+      cyclestate = 1,
+      cyclestate == 1,
+      Do[
+       r1 = Table[RandomReal[], {n}];
+       p = 
+        p + (1 - p)*MapThread[Boole[#1 < #2] &, {r1, g[s, p]}] - 
+         p*MapThread[Boole[#1 >= #2] &, {r1, g[s, p]}]*
+          MapThread[Boole[#1 <= #2] &, {r1, r[s, p] + g[s, p]}];
+       s = (1 - p)*Mod[s - v0 \[CapitalDelta]t0, d0, -d0/2] + 
+         p*(s - v0 \[CapitalDelta]t0);
+       f = p*s;
+       t = t + \[CapitalDelta]t0;
+       Sow[{t, p, f, s}];
+       , {stretchdistance/(v0*\[CapitalDelta]t0)}];
+      cyclestate = 0]
+     , {2*cycleamount}];
+   ];
+ prescribeddisplacementcycle = 
+  Flatten[Riffle[
+    Table[i*\[CapitalDelta]t0*v0, {cycleamount}, {i, 1, 
+      stretchdistance/(v0*\[CapitalDelta]t0)}],
+    Map[Reverse, 
+     Table[i*\[CapitalDelta]t0*v0, {cycleamount}, {i, 0, 
+       stretchdistance/(v0*\[CapitalDelta]t0) - 1}]]]];
+ ]
+cyclemeanbindingstate = 
+  Table[{cyclepathvector[[2, 1, i, 1]], 
+    Mean[cyclepathvector[[2, 1, i, 2]]]}, {i, 
+    Length[cyclepathvector[[2, 1]]]}];
+cyclemeanload = 
+  Table[{cyclepathvector[[2, 1, i, 1]], 
+    Mean[cyclepathvector[[2, 1, i, 3]]]}, {i, 
+    Length[cyclepathvector[[2, 1]]]}];
+cyclemeanloadvsdisplacement = 
+  Table[{prescribeddisplacementcycle[[i]], 
+    Mean[cyclepathvector[[2, 1, i, 3]]]}, {i, 
+    Length[cyclepathvector[[2, 1]]]}];
+cycleprescribedvst = 
+  Table[{cyclepathvector[[2, 1, i, 1]], 
+    prescribeddisplacementcycle[[i]]}, {i, 
+    Length[cyclepathvector[[2, 1]]]}];
+cyclestdbindingstate = 
+  Table[{cyclepathvector[[2, 1, i, 1]], 
+    StandardDeviation[cyclepathvector[[2, 1, i, 2]]]}, {i, 
+    Length[cyclepathvector[[2, 1]]]}];
+cyclestdload = 
+  Table[{cyclepathvector[[2, 1, i, 1]], 
+    StandardDeviation[cyclepathvector[[2, 1, i, 3]]]}, {i, 
+    Length[cyclepathvector[[2, 1]]]}];
