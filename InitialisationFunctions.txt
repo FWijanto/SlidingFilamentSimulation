@@ -1,0 +1,44 @@
+r[s_, p_] := 
+ MapThread[
+  If[Abs[#1] <= (k0 + 1)/
+     2, #2*\[CapitalDelta]t0*2 E^(-(energyconstant/4))*
+     E^(-((energyconstant*#1^2)/(1 + k0)))*Cosh[#1*energyconstant], 
+    1] &, {s, p}](*k^-\[Times]\[CapitalDelta]t0*)
+
+g[s_, p_] := (1 - p)*\[CapitalDelta]t0*kon/2*
+  timeconstant*(Erf[(s + 0.5)*Sqrt[energyconstant]] - 
+    Erf[(s - 0.5)*Sqrt[
+      energyconstant]])(*k^+\[Times]\[CapitalDelta]t0*)(*Integrate[\
+\[ExponentialE]^(-0.5 xsurdelta^2),{xsurdelta,s/\[Delta]-0.5,s/\
+\[Delta]+0.5}]*)
+
+trajectorybindingstate[x_] := 
+  Table[{pathvector[[2, 1, i, 1]], pathvector[[2, 1, i, 2, x]]}, {i, 
+    Nrealisation + 1}];
+trajectoryload[x_] := 
+  Table[{pathvector[[2, 1, i, 1]], pathvector[[2, 1, i, 3, x]]}, {i, 
+    Nrealisation + 1}];
+trajectoryloadvsdisplacement[x_] := 
+  Table[{prescribeddisplacementlinear[[i]], 
+    pathvector[[2, 1, i, 3, x]]}, {i, Nrealisation + 1}];
+cycletrajectorybindingstate[x_] := 
+  Table[{cyclepathvector[[2, 1, i, 1]], 
+    cyclepathvector[[2, 1, i, 2, x]]}, {i, 
+    Length[cyclepathvector[[2, 1]]]}];
+cycletrajectoryload[x_] := 
+  Table[{cyclepathvector[[2, 1, i, 1]], 
+    cyclepathvector[[2, 1, i, 3, x]]}, {i, 
+    Length[cyclepathvector[[2, 1]]]}];
+cycletrajectoryloadvsdisplacement[x_] := 
+  Table[{prescribeddisplacementcycle[[i]], 
+    cyclepathvector[[2, 1, i, 3, x]]}, {i, 
+    Length[cyclepathvector[[2, 1]]]}];
+averageloadextractor[x_, averagestartpoint_(*en s*), 
+   averageendpoint_(*en s*)] := {Mean[
+    Transpose[
+      x[[IntegerPart[averagestartpoint/\[CapitalDelta]t0 + 1] ;; 
+        IntegerPart[averageendpoint/\[CapitalDelta]t0 + 1]]]][[2]]], 
+   StandardDeviation[
+    Transpose[
+      x[[IntegerPart[averagestartpoint/\[CapitalDelta]t0 + 1] ;; 
+        IntegerPart[averageendpoint/\[CapitalDelta]t0 + 1]]]][[2]]]};
