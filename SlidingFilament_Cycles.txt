@@ -5,39 +5,90 @@ Module[{n = 1000,
   s, r1, p, f, t = 0, cyclestate = 0},
  s = Table[RandomReal[{-d0/2, d0/2}], {n}];
  p = Table[RandomChoice[initialpvector -> {0, 1}], {n}];
- f = p*s;
- cyclepathvector = Reap[Do[
-     Which[
-      cyclestate == 0,
-      Do[
-       r1 = Table[RandomReal[], {n}];
-       p = 
-        p + (1 - p)*MapThread[Boole[#1 < #2] &, {r1, g[s, p]}] - 
-         p*MapThread[Boole[#1 >= #2] &, {r1, g[s, p]}]*
-          MapThread[Boole[#1 <= #2] &, {r1, r[s, p] + g[s, p]}];
-       s = (1 - p)*Mod[s + v0 \[CapitalDelta]t0, d0, -d0/2] + 
-         p*(s + v0 \[CapitalDelta]t0);
-       f = p*s;
-       t = t + \[CapitalDelta]t0;
-       Sow[{t, p, f, s}];
-       , {stretchdistance/(v0*\[CapitalDelta]t0)}];
-      cyclestate = 1,
-      cyclestate == 1,
-      Do[
-       r1 = Table[RandomReal[], {n}];
-       p = 
-        p + (1 - p)*MapThread[Boole[#1 < #2] &, {r1, g[s, p]}] - 
-         p*MapThread[Boole[#1 >= #2] &, {r1, g[s, p]}]*
-          MapThread[Boole[#1 <= #2] &, {r1, r[s, p] + g[s, p]}];
-       s = (1 - p)*Mod[s - v0 \[CapitalDelta]t0, d0, -d0/2] + 
-         p*(s - v0 \[CapitalDelta]t0);
-       f = p*s;
-       t = t + \[CapitalDelta]t0;
-       Sow[{t, p, f, s}];
-       , {stretchdistance/(v0*\[CapitalDelta]t0)}];
-      cyclestate = 0]
-     , {2*cycleamount}];
+ f = Total[
+   (Table[1 - Unitize[p - i]
+       , {i, 
+        Table[i, {i, 2 - neighbourtest[neighbourcriterion], -1, 1}]~
+         Join~Table[i, {i, 2, neighbourtest[neighbourcriterion]}]}
+       ]*Table[-i*d0 + s
+       , {i, 
+        Table[i, {i, 2 - neighbourtest[neighbourcriterion], -1, 1}]~
+         Join~Table[i, {i, 2, neighbourtest[neighbourcriterion]}]}
+       ])~Join~{((1 - Unitize[p - 1])*s)}
    ];
+ cyclepathvector = Reap[Do[
+      Which[
+       cyclestate == 0,
+       Do[
+        r1 = Table[RandomReal[], {n}];
+        p = 
+         p + (1 - Unitize[p])*
+           MapThread[Boole[#1 < #2] &, {r1, g[swrapped[s], p]}] + 
+          attachmentfunctionplus[s, p, r1] + 
+          attachmentfunctionminus[s, p, r1] - 
+          p*MapThread[Boole[#1 >= #2] &, {r1, cumulativeprob[s, p]}]*
+           
+           MapThread[
+            Boole[#1 <= #2] &, {r1, r[s, p] + cumulativeprob[s, p]}];
+        s = (1 - Unitize[p])*
+           Mod[s + v0 \[CapitalDelta]t0, d0, -d0/2] + 
+          Unitize[p]*(s + v0 \[CapitalDelta]t0);
+        f = Total[
+          (Table[1 - Unitize[p - i]
+              , {i, 
+               Table[i, {i, 2 - neighbourtest[neighbourcriterion], -1,
+                   1}]~Join~
+                Table[i, {i, 2, neighbourtest[neighbourcriterion]}]}
+              ]*Table[-i*d0 + s
+              , {i, 
+               Table[i, {i, 2 - neighbourtest[neighbourcriterion], -1,
+                   1}]~Join~
+                Table[i, {i, 2, neighbourtest[neighbourcriterion]}]}
+              ])~Join~{((1 - Unitize[p - 1])*s)}
+          ];
+        t = t + \[CapitalDelta]t0;
+        Sow[{t, 
+          MapThread[(If[Negative[#1] == False, #1 + #2, 
+              If[#2 == 1, #1 + #2 - 1, #1 + #2]]) &, {Quotient[s, 
+             d0, -d0/2], p}], f}];
+        , {stretchdistance/(v0*\[CapitalDelta]t0)}];
+       cyclestate = 1,
+       cyclestate == 1,
+       Do[
+        r1 = Table[RandomReal[], {n}];
+        p = 
+         p + (1 - Unitize[p])*
+           MapThread[Boole[#1 < #2] &, {r1, g[swrapped[s], p]}] + 
+          attachmentfunctionplus[s, p, r1] + 
+          attachmentfunctionminus[s, p, r1] - 
+          p*MapThread[Boole[#1 >= #2] &, {r1, cumulativeprob[s, p]}]*
+           MapThread[
+            Boole[#1 <= #2] &, {r1, r[s, p] + cumulativeprob[s, p]}];
+        s = (1 - Unitize[p])*
+           Mod[s + v0 \[CapitalDelta]t0, d0, -d0/2] + 
+          Unitize[p]*(s + v0 \[CapitalDelta]t0);
+        f = Total[
+          (Table[1 - Unitize[p - i]
+              , {i, 
+               Table[i, {i, 2 - neighbourtest[neighbourcriterion], -1,
+                   1}]~Join~
+                Table[i, {i, 2, neighbourtest[neighbourcriterion]}]}
+              ]*Table[-i*d0 + s
+              , {i, 
+               Table[i, {i, 2 - neighbourtest[neighbourcriterion], -1,
+                   1}]~Join~
+                Table[i, {i, 2, neighbourtest[neighbourcriterion]}]}
+              ])~Join~{((1 - Unitize[p - 1])*s)}
+          ];
+        t = t + \[CapitalDelta]t0;
+        Sow[{t, 
+          MapThread[(If[Negative[#1] == False, #1 + #2, 
+              If[#2 == 1, #1 + #2 - 1, #1 + #2]]) &, {Quotient[s, 
+             d0, -d0/2], p}], f}];
+        , {stretchdistance/(v0*\[CapitalDelta]t0)}];
+       cyclestate = 0]
+      , {2*cycleamount}];
+    ][[2, 1]];
  prescribeddisplacementcycle = 
   Flatten[Riffle[
     Table[i*\[CapitalDelta]t0*v0, {cycleamount}, {i, 1, 
@@ -47,26 +98,23 @@ Module[{n = 1000,
        stretchdistance/(v0*\[CapitalDelta]t0) - 1}]]]];
  ]
 cyclemeanbindingstate = 
-  Table[{cyclepathvector[[2, 1, i, 1]], 
-    Mean[cyclepathvector[[2, 1, i, 2]]]}, {i, 
-    Length[cyclepathvector[[2, 1]]]}];
+  Table[{cyclepathvector[[i, 1]], 
+    Mean[Abs@cyclepathvector[[i, 2]]]}, {i, 
+    Length[cyclepathvector]}];
 cyclemeanload = 
-  Table[{cyclepathvector[[2, 1, i, 1]], 
-    Mean[cyclepathvector[[2, 1, i, 3]]]}, {i, 
-    Length[cyclepathvector[[2, 1]]]}];
+  Table[{cyclepathvector[[i, 1]], Mean[cyclepathvector[[i, 3]]]}, {i, 
+    Length[cyclepathvector]}];
 cyclemeanloadvsdisplacement = 
   Table[{prescribeddisplacementcycle[[i]], 
-    Mean[cyclepathvector[[2, 1, i, 3]]]}, {i, 
-    Length[cyclepathvector[[2, 1]]]}];
+    Mean[cyclepathvector[[i, 3]]]}, {i, Length[cyclepathvector]}];
 cycleprescribedvst = 
-  Table[{cyclepathvector[[2, 1, i, 1]], 
-    prescribeddisplacementcycle[[i]]}, {i, 
-    Length[cyclepathvector[[2, 1]]]}];
+  Table[{cyclepathvector[[i, 1]], 
+    prescribeddisplacementcycle[[i]]}, {i, Length[cyclepathvector]}];
 cyclestdbindingstate = 
-  Table[{cyclepathvector[[2, 1, i, 1]], 
-    StandardDeviation[cyclepathvector[[2, 1, i, 2]]]}, {i, 
-    Length[cyclepathvector[[2, 1]]]}];
+  Table[{cyclepathvector[[i, 1]], 
+    StandardDeviation[Abs@cyclepathvector[[i, 2]]]}, {i, 
+    Length[cyclepathvector]}];
 cyclestdload = 
-  Table[{cyclepathvector[[2, 1, i, 1]], 
-    StandardDeviation[cyclepathvector[[2, 1, i, 3]]]}, {i, 
-    Length[cyclepathvector[[2, 1]]]}];
+  Table[{cyclepathvector[[i, 1]], 
+    StandardDeviation[cyclepathvector[[i, 3]]]}, {i, 
+    Length[cyclepathvector]}];

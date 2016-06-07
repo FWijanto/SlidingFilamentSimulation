@@ -101,3 +101,8 @@ ListPlot[{meanbindingstaterelaxationb, meanbindingstaterelaxationu},
  AxesLabel -> {Style["Temps", Medium, Red], 
    Style["\[LeftAngleBracket]Etat d'Attachement\[RightAngleBracket]", 
     Medium, Red]}, ImageSize -> Large, PlotRange -> All]
+
+(*LoadSpeed Graph*)
+ListPlot[loadspeeddata, 
+ AxesLabel -> {Style["Vitesse", Medium, Red], 
+   Style["Force Stationnaire", Medium, Red]}]

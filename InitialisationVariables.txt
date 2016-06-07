@@ -1,24 +1,17 @@
 Nrealisation = 1000.;
-(*\[Delta]=1;*)(*nm*)
 
-kon = 10.;(*kon=Subscript[k, on]/(Subscript[k, off]E^-Subscript[U, \
-0]), Subscript[k, off]=10^-3 Hz, Subscript[k, on]=10^-2 Hz*)
+kon = 10.;
 
-timeconstant = 
-  1.; (*timeconstant=Subscript[k, off]\[ExponentialE]^-Subscript[\
-\[Beta]U, 0]*)
-(*v=5;*) (*nm.s^-1*)
+timeconstant = 1.
 
-v0 = 15.;(*v0=v/(Subscript[k, \
-off]\[ExponentialE]^-Subscript[\[Beta]U, 0] \[Delta]), v en nm.s^-1*)
+v0 = 15.;
 
-k0 = 10.; (*k0=k/\[Kappa], k en pN.nm^-1*)
+k0 = 10.;
 
-energyconstant = 
-  2;(*energyconstant=\[Beta]\[Kappa]\[Delta]^2/2*)(*\[Beta]=4;*)
+energyconstant = 2;
 
-d0 = 0.5; (*d0=d/\[Delta], d en nm*)
-\[CapitalDelta]t0 = 
-  0.001; (*\[CapitalDelta]t0=\[Alpha]\[CapitalDelta]t, \
-\[CapitalDelta]t en s*)
+d0 = 0.5;
+
+\[CapitalDelta]t0 = 0.001; 
+
 neighbourcriterion = 0.01;
