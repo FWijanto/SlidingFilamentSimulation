@@ -18,7 +18,7 @@ positionslistplus[s_] := Prepend[
 
 positionslistminus[s_] := Prepend[
    Table[i*d0 + swrapped[s]
-    , {i, neighbourtest[neighbourcriterion] - 2}]
+    , {i, neighbourtest[neighbourcriterion]}]
    , Last[positionslistplus[s]]];
 
 attachmentfunctionplus[s_, p_, r1_] := 
@@ -42,10 +42,10 @@ attachmentfunctionplus[s_, p_, r1_] :=
    , 0];
 
 attachmentfunctionminus[s_, p_, r1_] := 
-  If[neighbourtest[neighbourcriterion] > 1,
+  If[neighbourtest[neighbourcriterion] > 0,
    Total[
     Table[-i*(1 - Unitize[p]), {i, 1, 
-       neighbourtest[neighbourcriterion] - 2}]*MapThread[
+       neighbourtest[neighbourcriterion]}]*MapThread[
       (MapThread[(Boole[#1 > #2]) &, {r1, #1}]*
          MapThread[(Boole[#1 < #2]) &, {r1, #2}]) &
       , Transpose[
@@ -60,20 +60,14 @@ attachmentfunctionminus[s_, p_, r1_] :=
     ]
    , 0];
 
-cumulativeprob[s_, p_] := If[neighbourtest[neighbourcriterion] > 2,
+cumulativeprob[s_, p_] := If[neighbourtest[neighbourcriterion] > 0,
    Last[
     Accumulate[
      Map[
       g[#, p] &, positionslistminus[s]]
      ]
     ]
-   , If[neighbourtest[neighbourcriterion] > 1,
-    Last[
-     Accumulate[
-      Map[
-       g[#, p] &, positionslistplus[s]]
-      ]
-     ], g[swrapped[s], p]]];
+   , g[swrapped[s], p]];
 
 trajectorybindingstate[x_] := 
   Table[{pathvector[[i, 1]], pathvector[[i, 2, x]]}, {i, 
