@@ -1,0 +1,10 @@
+(*Data Exporting*)
+SetDirectory[
+  ""];(*<--- Set Directory path Here*)
+Export["CourbeForceVitesse_d" <> ToString[d0] <> "_" <> 
+  DateString[{"DayShort", "_", "MonthShort", "_", "Year"}] <> ".dat", 
+ Prepend[loadspeeddata, {"v", "<F>"}]];
+
+(*Data Importing*)
+SetDirectory[""];(*<--- Set Directory path Here*)
+loadspeeddata = Drop[Import[""], 1];(*<--- Set file name Here*)
