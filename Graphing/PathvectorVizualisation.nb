@@ -1,0 +1,164 @@
+pathvectorvizualisation[pathvector_] :=
+
+  Module[{maxiteration = Length[pathvector[[2, 1]]],
+    prescribedloadlinear, meanbindingstate, meandisplacement,
+    prescribedvst, forcevariationperheadvst, cumulativestddev,
+    cumulativedisplacement, cumulativedriftspeed},
+   If[StringQ[First[pathvector]] == True, Print[First[pathvector]]];
+   prescribedloadlinear =
+    Prepend[Table[pathvector[[2, -1]], {maxiteration - 1}], 0];
+   meanbindingstate =
+    Transpose[{pathvector[[2, 1]],
+      Map[Mean[Unitize[#]] &, pathvector[[2, 2]]]}];
+   meandisplacement =
+    Transpose[{pathvector[[2, 1]], Map[Mean, pathvector[[2, 3]]]}];
+   prescribedvst =
+    Transpose[{pathvector[[2, 1]], prescribedloadlinear}];
+   forcevariationperheadvst =
+    Transpose[{pathvector[[2, 1]], pathvector[[2, 4]]}];
+   cumulativestddev =
+    Transpose[{Rest[pathvector[[2, 1]]],
+      Map[StandardDeviation,
+       Table[pathvector[[2, 4]][[1 ;; i]], {i, 2, maxiteration}]]}];
+   cumulativedisplacement =
+    Transpose[{pathvector[[2, 1]], Accumulate[pathvector[[2, 4]]]}];
+   cumulativedriftspeed =
+    Transpose[{Rest[pathvector[[2, 1]]],
+      Rest[Accumulate[pathvector[[2, 4]]]]/
+       Accumulate[Differences[pathvector[[2, 1]]]]}];
+   Map[CellPrint[ExpressionCell[#]] &,
+    {ListPlot[prescribedloadlinear,
+      AxesLabel -> {Style["Itération", Medium, Red],
+        Style["Consigne (f)", Medium, Red]}, ImageSize -> Large],
+     ListPlot[meanbindingstate,
+      AxesLabel -> {Style["Temps", Medium, Red],
+        Style["\[LeftAngleBracket]Etat d'Attachement\
+\[RightAngleBracket]", Medium, Red]}, PlotRange -> {Automatic, All},
+      ImageSize -> Large],
+     ListPlot[meandisplacement,
+      AxesLabel -> {Style["Temps", Medium, Red],
+        Style["\[LeftAngleBracket]s\[RightAngleBracket]", Medium,
+         Red]}, PlotRange -> {Automatic, All}, ImageSize -> Large],
+     ListPlot[forcevariationperheadvst,
+      AxesLabel -> {Style["Temps", Medium, Red],
+        Style["\[CapitalDelta]f", Medium, Red]},
+      PlotRange -> {Automatic, Automatic}, ImageSize -> Large],
+     ListPlot[cumulativestddev,
+      AxesLabel -> {Style["Temps", Medium, Red],
+        Style["Ecart Type Cumulé", Medium, Red]},
+      PlotRange -> {Automatic, All}, ImageSize -> Large],
+     Histogram[pathvector[[2, 4]],
+      PlotLabel ->
+       Style["Fréquence des \[CapitalDelta]f", Medium, Red],
+      ImageSize -> Large],
+     Print[
+      "Mean \[CapitalDelta]f = " <>
+       ToString[Mean[pathvector[[2, 4]]]] <>
+       " | standard deviation of \[CapitalDelta]f = " <>
+       ToString[StandardDeviation[pathvector[[2, 4]]]]],
+     ListPlot[cumulativedisplacement,
+      AxesLabel -> {Style["Temps", Medium, Red],
+        Style["Déplacement cumulé", Medium, Red]},
+      PlotRange -> {Automatic, Automatic}, ImageSize -> Large],
+     ListPlot[cumulativedriftspeed,
+      AxesLabel -> {Style["Temps", Medium, Red],
+        Style["Vitesse nette de la barre", Medium, Red]},
+      PlotRange -> {Automatic, Automatic}, ImageSize -> Large]}]
+   ];
+
+   multipathvectorvizualisation[
+   pathvector_(*list of pathvectors to plot together*),
+   pathvectorlistlength_(*number of dataset in the list to plot*)] :=
+
+    Module[{maxiteration, maxiterationlist,
+    temporarypathvectorstorage, prescribedloadlinear,
+    meanbindingstate, meandisplacement, prescribedvst,
+    forcevariationperheadvst, cumulativestddev,
+    cumulativedisplacement, cumulativedriftspeed},
+
+   temporarypathvectorstorage = Last[Reap[Do[
+       maxiteration = Length[pathvector[[i, 2, 1]]];
+       Sow[maxiteration, tag1];
+       If[StringQ[First[pathvector[[i]]]] == True,
+        Print[First[pathvector[[i]]] <> "for run number " <>
+          IntegerString[i]]];
+       Sow[
+        Prepend[Table[pathvector[[i, 2, -1]], {maxiteration - 1}], 0],
+         tag2];
+       Sow[
+        Transpose[{pathvector[[i, 2, 1]],
+          Map[Mean[Unitize[#]] &, pathvector[[i, 2, 2]]]}], tag3];
+       prescribedloadlinear =
+        Transpose[{pathvector[[i, 2, 1]],
+          Map[Mean, pathvector[[i, 2, 3]]]}];
+       Sow[prescribedloadlinear, tag4];
+       Sow[Transpose[{pathvector[[i, 2, 1]], prescribedloadlinear}],
+        tag5];
+       Sow[Transpose[{pathvector[[i, 2, 1]], pathvector[[i, 2, 4]]}],
+        tag6];
+       Sow[
+        Transpose[{Rest[pathvector[[i, 2, 1]]],
+          Map[StandardDeviation,
+           Table[pathvector[[i, 2, 4]][[1 ;; j]], {j, 2,
+             maxiteration}]]}], tag7];
+       Sow[
+        Transpose[{pathvector[[i, 2, 1]],
+          Accumulate[pathvector[[i, 2, 4]]]}], tag8];
+       Sow[
+        Transpose[{Rest[pathvector[[i, 2, 1]]],
+          Rest[Accumulate[pathvector[[i, 2, 4]]]]/
+           Accumulate[Differences[pathvector[[i, 2, 1]]]]}], tag9];
+       , {i, pathvectorlistlength}]]];
+
+   maxiterationlist = temporarypathvectorstorage[[1]];
+   prescribedloadlinear = temporarypathvectorstorage[[2]];
+   meanbindingstate = temporarypathvectorstorage[[3]];
+   meandisplacement = temporarypathvectorstorage[[4]];
+   prescribedvst = temporarypathvectorstorage[[5]];
+   forcevariationperheadvst = temporarypathvectorstorage[[6]];
+   cumulativestddev = temporarypathvectorstorage[[7]];
+   cumulativedisplacement = temporarypathvectorstorage[[8]];
+   cumulativedriftspeed = temporarypathvectorstorage[[9]];
+
+   Map[CellPrint[ExpressionCell[#]] &,
+    {ListPlot[prescribedloadlinear,
+      AxesLabel -> {Style["Itération", Medium, Red],
+        Style["Consigne (f)", Medium, Red]}, ImageSize -> Large],
+     ListPlot[meanbindingstate,
+      AxesLabel -> {Style["Temps", Medium, Red],
+        Style["\[LeftAngleBracket]Etat d'Attachement\
+\[RightAngleBracket]", Medium, Red]}, PlotRange -> {Automatic, All},
+      ImageSize -> Large],
+     ListPlot[meandisplacement,
+      AxesLabel -> {Style["Temps", Medium, Red],
+        Style["\[LeftAngleBracket]s\[RightAngleBracket]", Medium,
+         Red]}, PlotRange -> {Automatic, All}, ImageSize -> Large],
+     ListPlot[forcevariationperheadvst,
+      AxesLabel -> {Style["Temps", Medium, Red],
+        Style["\[CapitalDelta]f", Medium, Red]},
+      PlotRange -> {Automatic, Automatic}, ImageSize -> Large],
+     ListPlot[cumulativestddev,
+      AxesLabel -> {Style["Temps", Medium, Red],
+        Style["Ecart Type Cumulé", Medium, Red]},
+      PlotRange -> {Automatic, All}, ImageSize -> Large],
+     GraphicsRow[
+      Table[Histogram[pathvector[[i, 2, 4]],
+        PlotLabel ->
+         Style["Fréquence des \[CapitalDelta]f", Medium, Red],
+        ImageSize -> Large], {i, pathvectorlistlength}]],
+     Do[Print[
+       "Dataset " <> IntegerString[i] <> ": " <>
+        "Mean \[CapitalDelta]f = " <>
+        ToString[Mean[pathvector[[i, 2, 4]]]] <>
+        " | standard deviation of \[CapitalDelta]f = " <>
+        ToString[StandardDeviation[pathvector[[i, 2, 4]]]]], {i,
+       pathvectorlistlength}],
+     ListPlot[cumulativedisplacement,
+      AxesLabel -> {Style["Temps", Medium, Red],
+        Style["Déplacement cumulé", Medium, Red]},
+      PlotRange -> {Automatic, Automatic}, ImageSize -> Large],
+     ListPlot[cumulativedriftspeed,
+      AxesLabel -> {Style["Temps", Medium, Red],
+        Style["Vitesse nette de la barre", Medium, Red]},
+      PlotRange -> {Automatic, Automatic}, ImageSize -> Large]}]
+   ];
