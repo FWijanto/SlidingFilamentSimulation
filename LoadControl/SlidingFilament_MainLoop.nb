@@ -1,6 +1,6 @@
 SetAttributes[unidirectionaltractionexperimentloadcontrolled2,
   HoldFirst];
-unidirectionaltractionexperimentloadcontrolled2[pathvectorname_, n_,
+unidirectionaltractionexperimentloadcontrolled[pathvectorname_, n_,
   fprescribed_, initialpvector_,
   Nrealisation_, {konarg_, timeconstantarg_, k0arg_,
    energyconstantarg_, d0arg_,
