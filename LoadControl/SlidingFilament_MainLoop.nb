@@ -1,0 +1,134 @@
+SetAttributes[unidirectionaltractionexperimentloadcontrolled,
+  HoldFirst];
+unidirectionaltractionexperimentloadcontrolled[pathvectorname_, n_,
+   fprescribed_, initialpvector_,
+   Nrealisation_, {konarg_, timeconstantarg_, k0arg_,
+    energyconstantarg_, d0arg_,
+    neighbourcriterionarg_}(*microparameters*)] :=
+
+  Module[{\[CapitalDelta]f, s, p, r1, nattached, numberofneighbours,
+    waitingtimelist, waitingtimelistorderedindexes, indexofnextevent,
+    timeuntilnextevent, attachmenttransitionratematrix,
+    listofattachedstates, t = 0},
+   Block[{kon = konarg, timeconstant = timeconstantarg, k0 = k0arg,
+      energyconstant = energyconstantarg, d0 = d0arg,
+      neighbourcriterion = neighbourcriterionarg},
+     parametersforexport = {Nrealisation, kon, timeconstant, k0,
+       energyconstant, d0, neighbourcriterion, n, initialpvector,
+       fprescribed};
+     numberofneighbours = neighbourtest[neighbourcriterion];
+     listofattachedstates =
+      Table[i, {i, -numberofneighbours, -1}]~
+       Join~(Table[i, {i, 0, numberofneighbours}] + 1);
+     s = Table[RandomReal[{-d0/2, d0/2}], {n}];
+     p = Table[RandomChoice[initialpvector -> {0., 1.}], {n}];
+     nattached = initialpvector[[-1]]*n;
+     \[CapitalDelta]f = Total[Total[
+        (Table[1. - N[Unitize[p - i]]
+            , {i,
+             Table[i, {i, 2 - neighbourtest[neighbourcriterion], -1,
+                1}]~Join~
+              Table[i, {i, 2, neighbourtest[neighbourcriterion]}]}
+            ]*Table[-i*d0 + s
+            , {i,
+             Table[i, {i, 2 - neighbourtest[neighbourcriterion], -1,
+                1}]~Join~
+              Table[i, {i, 2, neighbourtest[neighbourcriterion]}]}
+            ])~Join~{((1. - N[Unitize[p - 1.]])*s)}
+        ]];
+
+     pathvectorname = Reap[
+       (*System evolution loop*)
+       Catch[Do[
+          Sow[t, tag1];
+
+          Sow[MapThread[(If[Negative[#1] == False, #1 + #2,
+               If[#2 == 1, #1 + #2 - 1, #1 + #2]]) &, {Quotient[s,
+              d0, -d0/2], p}], tag2];
+          Sow[s, tag3];
+          Sow[\[CapitalDelta]f/nattached, tag4];
+
+
+          attachmenttransitionratematrix =
+           attachmenttransitionratematrixgenerator[s, p];
+
+          waitingtimelist =
+           waitingtimegenerator[attachmenttransitionratematrix,
+            detachmentrate[s, p], s,
+            p];(*generate list of waiting time to next event for all \
+heads*)
+
+          waitingtimelistorderedindexes =
+           GatherBy[Ordering[waitingtimelist],
+            waitingtimelist[[#]] &];(*list of waiting time positions \
+in ascending order. Duplicates are grouped.*)
+          If[
+           Length[First[waitingtimelistorderedindexes]] > 1,
+
+           indexofnextevent =
+            Last[Last[
+              SortBy[Transpose[{s[[
+                  waitingtimelistorderedindexes[[1]]]],
+                 waitingtimelistorderedindexes[[1]]}],
+               Abs[First[#]] &]]],
+
+           indexofnextevent =
+            First[First[waitingtimelistorderedindexes]]
+           ];(*Select index of next event by lowest waiting time.
+          If there are duplicates (heads moving past the Kramers \
+validity threshold are detached with waiting time 0),
+          get the lowest index with largest |s|*)
+
+          timeuntilnextevent = waitingtimelist[[indexofnextevent]];
+
+          p[[indexofnextevent]] =
+           If[p[[indexofnextevent]] != 0., 0.,
+            RandomChoice[(attachmenttransitionratematrix[[
+                 indexofnextevent]]/
+                Total[attachmenttransitionratematrix[[
+                  indexofnextevent]]]) ->
+              listofattachedstates]];(*Change attachment state of \
+head with shortest waiting time. If it is an attachment event,
+          choose the binding site to attach to (closest or \
+neighbours...) weighted by attachment rate.*)
+          \
+\[CapitalDelta]f = fprescribed - Total[Total[
+              (Table[1 - N[Unitize[p - i]]
+                  , {i,
+                   Table[i, {i,
+                    2 - neighbourtest[neighbourcriterion], -1, 1}]~
+                    Join~Table[
+                    i, {i, 2, neighbourtest[neighbourcriterion]}]}
+                  ]*Table[-i*d0 + s
+                  , {i,
+                   Table[i, {i,
+                    2 - neighbourtest[neighbourcriterion], -1, 1}]~
+                    Join~
+                    Table[i, {i, 2,
+                    neighbourtest[neighbourcriterion]}]}
+                  ])~Join~{((1. - N[Unitize[p - 1]])*s)}
+              ]];
+          nattached = Total[Unitize[p]];
+
+          If[nattached == 0,
+           Throw["All heads detached at step "]];(*Attach the step at \
+which computation was aborted later when pathvector content is \
+accessible*)
+
+          s = (1. - N[Unitize[p]])*
+             Mod[s + (\[CapitalDelta]f/nattached), d0, -d0/2] +
+            N[Unitize[p]]*(s + (\[CapitalDelta]f/nattached));
+          t = t + timeuntilnextevent;
+          , {Nrealisation + 1}];
+        ]
+       ];
+     AppendTo[pathvectorname[[2]], fprescribed];
+     If[StringQ[pathvectorname[[1]]] == True,
+      pathvectorname[[1]] =
+       pathvectorname[[1]] <>
+        IntegerString[
+         Length[pathvectorname[[2, 1]]] +
+          1]](*If the computation has stopped,
+     attach the abort step to the thrown string*)
+     ];
+   ];
