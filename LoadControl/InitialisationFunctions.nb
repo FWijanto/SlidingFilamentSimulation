@@ -35,18 +35,3 @@ with structure: {...,row of (s-2d0), row of (s-d0), row of (s),
     headpositionswithneighbours]](*Get the transition rates \
 corresponding to each s. Lists of 0s correspond to attached heads*)
   ]
-
-waitingtimegenerator[attachmenttransitionratematrix_,
-   detachmentratelist_, s_, p_] :=
-  Map[
-    RandomVariate[ExponentialDistribution[#]] &,
-    Map[Total, attachmenttransitionratematrix] + detachmentratelist
-    ]*((N[
-        1. - Unitize[(-Floor[
-             Abs[s]/((k0 + 1)/2)])]](*Filter that gives 1 if |s|<(
-       k0+1)/2 and 0 if not*)*N[Unitize[p]]) + (1. -
-       N[Unitize[
-         p]]))(*Map[] module gives waiting time based on exponential \
-distribution of given transition rates. It is then multiplied with a \
-filter that puts to 0 the waiting times of attached heads which are \
-beyond the Kramers validity range ((k0+1)/2).*);
