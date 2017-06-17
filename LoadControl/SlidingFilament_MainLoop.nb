@@ -95,7 +95,7 @@ the farthest head which has gone by the Kramers validity range*)
                 Table[attachedpositionlist, {2*numberofneighbours +
                    1}]]],
               Flatten[
-               Table[{-1, 1, 2}, {Length[attachedpositionlist]}]]}]~
+               Table[listofattachedstates, {Length[attachedpositionlist]}]]}]~
             Join~Transpose[{detachmentratelist[[
                detachedpositionlist]], detachedpositionlist,
               ConstantArray[0., Length[detachedpositionlist]]}];
