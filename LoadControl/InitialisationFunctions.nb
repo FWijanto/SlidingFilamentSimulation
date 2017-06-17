@@ -8,7 +8,7 @@ attachmentrate[s_, p_] := (1. - N[Unitize[p]])*kon/2*
 
 neighbourtest[criterion_] :=
   Module[{n = 0},
-   While[(g[d0*(0.5 + n), 0]/g[0, 0]) > criterion, n++]; n];
+   While[(attachmentrate[d0*(0.5 + n), 0]/attachmentrate[0, 0]) > criterion, n++]; n];
 swrapped[s_] := Mod[s, d0, -d0/2];
 positionslistplus[s_] := Prepend[
    Table[i*d0 - swrapped[s]
