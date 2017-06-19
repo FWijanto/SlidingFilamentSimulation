@@ -101,7 +101,7 @@ the farthest head which has gone by the Kramers validity range*)
               ConstantArray[0., Length[detachedpositionlist]]}];
 
           timeuntilnextevent =
-           RandomVariate[ExponentialDistribution[totalrate]];
+          -Log[RandomReal[]]/totalrate;(*generate random variate of exponential distribution with parameter total rate*)
 
           nexteventpick =
            RandomChoice[
