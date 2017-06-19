@@ -54,7 +54,7 @@ opposite direction of traction.)}*)
           p*MapThread[Boole[#1 >= #2] &, {r1, cumulativeprob[s, p]}]*
            MapThread[
             Boole[#1 <= #2] &, {r1,
-             r[s, p, \[CapitalDelta]t0, k0, energyconstant] +
+             r[s, p] +
               cumulativeprob[s, p]}];
         s = (1 - Unitize[p])*
            Mod[s + vprescribed \[CapitalDelta]t0, d0, -d0/2] +
