@@ -1,5 +1,5 @@
 (*dictionary for convenient access of parameters*)
-parameterlookuptable[
+parameterlookuptableloadcontrol[
    parametername_String] := <|
     "Nrealisation" -> parametersforexport[[1]],
     "kon" -> parametersforexport[[2]],
@@ -12,8 +12,78 @@ parameterlookuptable[
     "initialpvector" -> parametersforexport[[9]],
     "fprescribed" -> parametersforexport[[10]]|>[parametername];
 
-(*Data Exporting*)
-exportfunction[pathvectorname_, exportlocation_, varyingparameter_,
+parameterlookuptablespeedcontrol[
+   parametername_String] := <|
+    "Nrealisation" -> parametersforexport[[1]],
+    "kon" -> parametersforexport[[2]],
+    "timeconstant" -> parametersforexport[[3]],
+    "k0" -> parametersforexport[[4]],
+    "energyconstant" -> parametersforexport[[5]],
+    "d0" -> parametersforexport[[6]],
+    "\[CapitalDelta]t0" -> parametersforexport[[7]],
+    "neighbourcriterion" -> parametersforexport[[8]],
+    "n" -> parametersforexport[[9]],
+    "initialpvector" -> parametersforexport[[10]],
+    "vprescribed" -> parametersforexport[[11]]|>[parametername];
+
+    (*Export functions*)
+
+exportfunctionloadcontrol[pathvectorname_, exportlocation_,
+   varyingparameter_,
+   varyingparameteractivationflag_(*whether to activate the varying \
+parameter descriptor or not. Value is True or False*),
+   identifieractivationflag_(*whether to activate the file identifier \
+or not. Value is True or False*), optionalfileidentifier_] :=
+
+  Module[{varyingparametervalue, columnlength},
+   SetDirectory[exportlocation];
+   Export[
+    "ParameterValues" <>
+     If[identifieractivationflag == True, optionalfileidentifier] <>
+     ".dat", Prepend[{parametersforexport}, {"Nrealisation", "kon",
+      "timeconstant", "k0", "energyconstant", "d0",
+      "neighbourcriterion", "n",
+      "initialpvector (pdetached, pattached)", varyingparameter}]];
+
+   varyingparametervalue =
+    IntegerString[Round[parameterlookuptable[varyingparameter]]];
+   columnlength = Round[parameterlookuptable["n"]];
+
+   Export[
+    "time_" <>
+     If[varyingparameteractivationflag == True, varyingparameter,
+      ""] <> If[identifieractivationflag == True,
+      optionalfileidentifier, ""] <> ".dat",
+    Prepend[pathvectorname[[2, 1]],
+     PadRight[{"time"}, columnlength, Null]]];
+   Export[
+    "p_" <> If[varyingparameteractivationflag == True,
+      varyingparameter, ""] <>
+     If[identifieractivationflag == True, optionalfileidentifier,
+      ""] <> ".dat",
+    Prepend[pathvectorname[[2, 2]],
+     PadRight[{"p (each line is the p vector for one time step)"},
+      columnlength, Null]]];
+   Export[
+    "s_" <> If[varyingparameteractivationflag == True,
+      varyingparameter, ""] <>
+     If[identifieractivationflag == True, optionalfileidentifier,
+      ""] <> ".dat",
+    Prepend[pathvectorname[[2, 3]],
+     PadRight[{"s (each line is the s vector for one time step)"},
+      columnlength, Null]]];
+   Export[
+    "ftotal_" <>
+     If[varyingparameteractivationflag == True, varyingparameter,
+      ""] <>
+     If[identifieractivationflag == True, optionalfileidentifier,
+      ""] <> ".dat",
+    Prepend[pathvectorname[[2, 4]],
+     PadRight[{"ftotal"}, columnlength, Null]]];
+   ];
+
+exportfunctionspeedcontrol[pathvectorname_, exportlocation_,
+  varyingparameter_,
   varyingparameteractivationflag_(*whether to activate the varying \
 parameter descriptor or not. Value is True or False*),
   identifieractivationflag_(*whether to activate the file identifier \
@@ -25,7 +95,7 @@ or not. Value is True or False*), optionalfileidentifier_] :=
     If[identifieractivationflag == True, optionalfileidentifier] <>
     ".dat", Prepend[{parametersforexport}, {"Nrealisation", "kon",
      "timeconstant", "k0", "energyconstant", "d0",
-     "neighbourcriterion", "n",
+     "\[CapitalDelta]t0", "neighbourcriterion", "n",
      "initialpvector (pdetached, pattached)", varyingparameter}]];
 
   varyingparametervalue =
