@@ -46,8 +46,8 @@ or not. Value is True or False*), optionalfileidentifier_] :=
       "initialpvector (pdetached, pattached)", varyingparameter}]];
 
    varyingparametervalue =
-    IntegerString[Round[parameterlookuptable[varyingparameter]]];
-   columnlength = Round[parameterlookuptable["n"]];
+    IntegerString[Round[parameterlookuptableloadcontrol[varyingparameter]]];
+   columnlength = Round[parameterlookuptableloadcontrol["n"]];
 
    Export[
     "time_" <>
@@ -99,8 +99,8 @@ or not. Value is True or False*), optionalfileidentifier_] :=
      "initialpvector (pdetached, pattached)", varyingparameter}]];
 
   varyingparametervalue =
-   IntegerString[Round[parameterlookuptable[varyingparameter]]];
-  columnlength = Round[parameterlookuptable["n"]];
+   IntegerString[Round[parameterlookuptablespeedcontrol[varyingparameter]]];
+  columnlength = Round[parameterlookuptablespeedcontrol["n"]];
 
   Export["time_" <>
     If[varyingparameteractivationflag == True, varyingparameter, ""] <>
