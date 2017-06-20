@@ -162,3 +162,35 @@ pathvectorvizualisationloadcontrol[pathvector_] :=
         Style["Vitesse nette de la barre", Medium, Red]},
       PlotRange -> {Automatic, Automatic}, ImageSize -> Large]}]
    ];
+
+   pathvectorvizualisationspeedcontrol[pathvector_] :=
+
+ Module[{maxiteration = Length[pathvector[[2, 1]]], prescribedspeed,
+   meanbindingstate, meanload, totalload, prescribedvst},
+  If[StringQ[First[pathvector]] == True, Print[First[pathvector]]];
+  prescribedspeed =
+   Prepend[Table[pathvector[[2, -1]], {maxiteration - 1}], 0];
+  meanbindingstate =
+   Transpose[{pathvector[[2, 1]],
+     Map[Mean[Unitize[#]] &, pathvector[[2, 2]]]}];
+  meanload =
+   Transpose[{pathvector[[2, 1]], Map[Mean, pathvector[[2, 3]]]}];
+  totalload = Transpose[{pathvector[[2, 1]], pathvector[[2, 4]]}];
+  prescribedvst = Transpose[{pathvector[[2, 1]], prescribedspeed}];
+  Map[CellPrint[ExpressionCell[#]] &,
+   {ListPlot[prescribedvst,
+     AxesLabel -> {Style["Temps", Medium, Red],
+       Style["Consigne (s)", Medium, Red]}, ImageSize -> Large],
+    ListPlot[meanbindingstate,
+     AxesLabel -> {Style["Temps", Medium, Red],
+       Style["\[LeftAngleBracket]Etat d'Attachement\
+\[RightAngleBracket]", Medium, Red]}, PlotRange -> {Automatic, All},
+     ImageSize -> Large],
+    ListPlot[meanload,
+     AxesLabel -> {Style["Temps", Medium, Red],
+       Style["\[LeftAngleBracket]Force\[RightAngleBracket]", Medium,
+        Red]}, PlotRange -> {Automatic, All}, ImageSize -> Large],
+    ListPlot[totalload,
+     AxesLabel -> {Style["Temps", Medium, Red],
+       Style["Force totale", Medium, Red]},
+     PlotRange -> {Automatic, All}, ImageSize -> Large]}];
