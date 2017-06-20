@@ -6,7 +6,7 @@ unidirectionaltractionexperimentspeedcontrolled[pathvectorname_, n_,
    energyconstantarg_, d0arg_,
    neighbourcriterionarg_}(*microparameters*)] :=
 
- Module[{s, r1, p, f, ftotal, t = 0},
+ Module[{s, r1, p, f, ftotal, nattached, t = 0},
   Block[{kon = konarg, timeconstant = timeconstantarg, k0 = k0arg,
      energyconstant = energyconstantarg,
      d0 = d0arg, \[CapitalDelta]t0 = \[CapitalDelta]t0arg,
@@ -20,6 +20,7 @@ unidirectionaltractionexperimentspeedcontrolled[pathvectorname_, n_,
     f = Total[
       (Table[1 - Unitize[p - i]
           , {i,
+
            Table[i, {i, 2 - neighbourtest[neighbourcriterion], -1,
               1}]~Join~
             Table[i, {i, 2, neighbourtest[neighbourcriterion]}]}
@@ -32,64 +33,68 @@ unidirectionaltractionexperimentspeedcontrolled[pathvectorname_, n_,
       ];
     ftotal = Total[f];
 
-    pathvectorname = Reap[Do[
-        Sow[t, tag1];
-        Sow[
-         MapThread[(If[Negative[#1] == False, #1 + #2,
-             If[#2 == 1, #1 + #2 - 1, #1 + #2]]) &, {Quotient[s,
-            d0, -d0/2], p}], tag2];
-        Sow[f, tag3];
-        Sow[ftotal, tag4];
+    pathvectorname = Reap[Catch[Do[
+          Sow[t, tag1];
 
-        (*Sow {time, binding state (integer showing attachment state.
-        0 is detached, 1 is attached to nearest neighbor,
-        2 to 2nd closest neighbour etc... negatives are attachment in \
-opposite direction of traction.)}*)
-        r1 = RandomReal[{0, 1}, n];
-        p =
-         p + (1 - Unitize[p])*
-           MapThread[Boole[#1 < #2] &, {r1, g[swrapped[s], p]}] +
-          attachmentfunctionplus[s, p, r1] +
-          attachmentfunctionminus[s, p, r1] -
-          p*MapThread[Boole[#1 >= #2] &, {r1, cumulativeprob[s, p]}]*
-           MapThread[
-            Boole[#1 <= #2] &, {r1,
-             r[s, p] +
-              cumulativeprob[s, p]}];
-        s = (1 - Unitize[p])*
-           Mod[s + vprescribed \[CapitalDelta]t0, d0, -d0/2] +
-          Unitize[p]*(s + vprescribed*\[CapitalDelta]t0);
-        f = Total[
-          (Table[1 - Unitize[p - i]
-              , {i,
-               Table[i, {i, 2 - neighbourtest[neighbourcriterion], -1,
-                   1}]~Join~
-                Table[i, {i, 2, neighbourtest[neighbourcriterion]}]}
-              ]*Table[-i*d0 + s
-              , {i,
-               Table[i, {i, 2 - neighbourtest[neighbourcriterion], -1,
-                   1}]~Join~
-                Table[i, {i, 2, neighbourtest[neighbourcriterion]}]}
-              ])~Join~{((1 - Unitize[p - 1])*s)}
-          ];
-        ftotal = Total[f];
-        t = t + \[CapitalDelta]t0;
-        , {Nrealisation + 1}];
+          Sow[MapThread[(If[Negative[#1] == False, #1 + #2,
+               If[#2 == 1, #1 + #2 - 1, #1 + #2]]) &, {Quotient[s,
+              d0, -d0/2], p}], tag2];
+          Sow[f, tag3];
+          Sow[ftotal, tag4];
+
+          (*Sow {time,
+          binding state (integer showing attachment state.
+          0 is detached, 1 is attached to nearest neighbor,
+          2 to 2nd closest neighbour etc... negatives are attachment \
+in opposite direction of traction.)}*)
+
+          r1 = RandomReal[{0, 1}, n];
+
+          p = p + (1 - Unitize[p])*
+             MapThread[Boole[#1 < #2] &, {r1, g[swrapped[s], p]}] +
+            attachmentfunctionplus[s, p, r1] +
+            attachmentfunctionminus[s, p, r1] -
+            p*MapThread[
+              Boole[#1 >= #2] &, {r1, cumulativeprob[s, p]}]*
+             MapThread[
+              Boole[#1 <= #2] &, {r1, r[s, p] + cumulativeprob[s, p]}];
+
+          s = (1 - Unitize[p])*
+             Mod[s + vprescribed \[CapitalDelta]t0, d0, -d0/2] +
+            Unitize[p]*(s + vprescribed*\[CapitalDelta]t0);
+          f = Total[
+            (Table[1 - Unitize[p - i]
+                , {i,
+                 Table[i, {i,
+                    2 - neighbourtest[neighbourcriterion], -1, 1}]~
+                  Join~Table[
+                   i, {i, 2, neighbourtest[neighbourcriterion]}]}
+                ]*Table[-i*d0 + s
+                , {i,
+                 Table[i, {i,
+                    2 - neighbourtest[neighbourcriterion], -1, 1}]~
+                  Join~Table[
+                   i, {i, 2, neighbourtest[neighbourcriterion]}]}
+                ])~Join~{((1 - Unitize[p - 1])*s)}
+            ];
+          ftotal = Total[f];
+          nattached = Total[Unitize[p]];
+
+          If[nattached == 0,
+           Throw["All heads detached at step "]];(*Attach the step at \
+which computation was aborted later when pathvector content is \
+accessible*)
+          t = t + \[CapitalDelta]t0;
+          , {Nrealisation + 1}];
+        ];
       ];
-    prescribeddisplacementlinear =
-     Table[i*\[CapitalDelta]t0*vprescribed, {i, 0, Nrealisation}];
-    meanbindingstate =
-     Transpose[{pathvectorname[[2, 1]],
-       Map[Mean[Unitize[#]] &, pathvectorname[[2, 2]]]}];
-    meanload =
-     Transpose[{pathvectorname[[2, 1]],
-       Map[Mean, pathvectorname[[2, 3]]]}];
-    totalload =
-     Transpose[{pathvectorname[[2, 1]], pathvectorname[[2, 4]]}];
-    meanloadvsdisplacement =
-     Transpose[{prescribeddisplacementlinear,
-       Map[Mean, pathvectorname[[2, 3]]]}];
-    prescribedvst =
-     Transpose[{pathvectorname[[2, 1]], prescribeddisplacementlinear}];
+    AppendTo[pathvectorname[[2]], vprescribed];
+    If[StringQ[pathvectorname[[1]]] == True,
+     pathvectorname[[1]] =
+      pathvectorname[[1]] <>
+       IntegerString[
+        Length[pathvectorname[[2, 1]]] +
+         1]](*If the computation has stopped,
+    attach the abort step to the thrown string*)
     ];
   ]
