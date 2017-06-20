@@ -1,11 +1,11 @@
-r[s_, p_] := 
+r[s_, p_] :=
  MapThread[
   If[Abs[#1] <= (k0 + 1)/2, #2*\[CapitalDelta]t0*2 E^(-(energyconstant/4))*E^(-((energyconstant*#1^2)/(1 + k0)))*Cosh[#1*energyconstant],1] &, {s, Unitize[p]}]
 
 g[s_, p_] := (1 - Unitize[p])*\[CapitalDelta]t0*kon/2*timeconstant*(Erf[(s + 0.5)*Sqrt[energyconstant]] - Erf[(s - 0.5)*Sqrt[energyconstant]])
 
-neighbourtest[criterion_] := 
-  Module[{n = 0}, 
+neighbourtest[criterion_] :=
+  Module[{n = 0},
    While[(g[d0*(0.5 + n), 0]/g[0, 0]) > criterion, n++]; n];
 
 swrapped[s_] := Mod[s, d0, -d0/2];
@@ -21,11 +21,11 @@ positionslistminus[s_] := Prepend[
     , {i, neighbourtest[neighbourcriterion]}]
    , Last[positionslistplus[s]]];
 
-attachmentfunctionplus[s_, p_, r1_] := 
+attachmentfunctionplus[s_, p_, r1_] :=
   If[neighbourtest[neighbourcriterion] > 0,
    Total[
     Table[
-      i*(1 - Unitize[p]), {i, 2, 
+      i*(1 - Unitize[p]), {i, 2,
        neighbourtest[neighbourcriterion] + 1}]*MapThread[
       (MapThread[(Boole[#1 > #2]) &, {r1, #1}]*
          MapThread[(Boole[#1 < #2]) &, {r1, #2}]) &
@@ -41,10 +41,10 @@ attachmentfunctionplus[s_, p_, r1_] :=
     ]
    , 0];
 
-attachmentfunctionminus[s_, p_, r1_] := 
+attachmentfunctionminus[s_, p_, r1_] :=
   If[neighbourtest[neighbourcriterion] > 0,
    Total[
-    Table[-i*(1 - Unitize[p]), {i, 1, 
+    Table[-i*(1 - Unitize[p]), {i, 1,
        neighbourtest[neighbourcriterion]}]*MapThread[
       (MapThread[(Boole[#1 > #2]) &, {r1, #1}]*
          MapThread[(Boole[#1 < #2]) &, {r1, #2}]) &
@@ -68,36 +68,3 @@ cumulativeprob[s_, p_] := If[neighbourtest[neighbourcriterion] > 0,
      ]
     ]
    , g[swrapped[s], p]];
-
-trajectorybindingstate[x_] := 
-  Table[{pathvector[[i, 1]], pathvector[[i, 2, x]]}, {i, 
-    Nrealisation + 1}];
-
-trajectoryload[x_] := 
-  Table[{pathvector[[i, 1]], pathvector[[i, 3, x]]}, {i, 
-    Nrealisation + 1}];
-
-trajectoryloadvsdisplacement[x_] := 
-  Table[{prescribeddisplacementlinear[[i]], 
-    pathvector[[i, 3, x]]}, {i, Nrealisation + 1}];
-
-cycletrajectorybindingstate[x_] := 
-  Table[{cyclepathvector[[i, 1]], cyclepathvector[[i, 2, x]]}, {i, 
-    Length[cyclepathvector]}];
-
-cycletrajectoryload[x_] := 
-  Table[{cyclepathvector[[i, 1]], cyclepathvector[[i, 3, x]]}, {i, 
-    Length[cyclepathvector]}];
-
-cycletrajectoryloadvsdisplacement[x_] := 
-  Table[{prescribeddisplacementcycle[[i]], 
-    cyclepathvector[[i, 3, x]]}, {i, Length[cyclepathvector]}];
-
-averageloadextractor[x_, averagestartpoint_(*en s*), averageendpoint_(*en s*)] := {Mean[
-    Transpose[
-      x[[IntegerPart[averagestartpoint/\[CapitalDelta]t0 + 1] ;; 
-        IntegerPart[averageendpoint/\[CapitalDelta]t0 + 1]]]][[2]]], 
-   StandardDeviation[
-    Transpose[
-      x[[IntegerPart[averagestartpoint/\[CapitalDelta]t0 + 1] ;; 
-        IntegerPart[averageendpoint/\[CapitalDelta]t0 + 1]]]][[2]]]};

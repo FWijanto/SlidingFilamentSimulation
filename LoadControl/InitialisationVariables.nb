@@ -6,18 +6,13 @@ With[{Nrealisation = 10000.(*\[Delta]=1;*)(*nm*),
   off]\[ExponentialE]^-Subscript[\[Beta]U, 0]*)
   (*v=5;*) (*nm.s^-1*)
 
-    v0 = 15.,(*v0=v/(Subscript[k,
-  off]\[ExponentialE]^-Subscript[\[Beta]U, 0] \[Delta]), v en nm.s^-1*)
-
     k0 = 10., (*k0=k/\[Kappa], k en pN.nm^-1*)
 
   energyconstant = 2,(*energyconstant=\[Beta]\[Kappa]\[Delta]^2/
   2*)(*\[Beta]=4;*)
   d0 = 1.5, (*d0=d/\[Delta],
   d en nm*)
-  \[CapitalDelta]t0 =
-   0.005, (*\[CapitalDelta]t0=\[Alpha]\[CapitalDelta]t, \
-\[CapitalDelta]t en s*)
+
   neighbourcriterion = 0.01
   },
  microparameters = {kon, timeconstant, k0, energyconstant, d0,
