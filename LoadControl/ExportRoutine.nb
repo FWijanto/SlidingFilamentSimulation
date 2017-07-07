@@ -1,0 +1,21 @@
+(*Make sure to give suitable values to microparametervalue*)
+
+Module[{pathvectorname = pathvector, n = 200., Nrealisation = 20000.,
+   statisticalrepetition = 20, startingf = 0., endingf = 100.,
+  finterval = 10., varyingparameter = "fprescribed",
+  microparameters = microparametervalue,
+  exportlocation = "path/to/location", varyingparametervalue,
+  statisticalrunstart = 1(*loop counter starting point for the statistical run*)},
+ Do[
+  unidirectionaltractionexperimentloadcontrolled[pathvectorname, n, fprescribed, {0.28, 0.72}, Nrealisation, microparameters];
+  varyingparametervalue = "_" <> IntegerString[Round[parameterlookuptableloadcontrol[varyingparameter]]];
+  If[statisticalruncounter == 1,
+   CreateDirectory[exportlocation <> "/" <>
+   DateString[{"Day", "_", "Month", "_", "Year"}] <> "AdditionalNaming" <>
+   "/" <> varyingparameter <>varyingparametervalue];];
+  exportfunctionloadcontrol[pathvectorname, exportlocation <> "/" <>
+    DateString[{"Day", "_", "Month", "_", "Year"}] <> "AdditionalNaming" <>
+     "/" <> varyingparameter <> varyingparametervalue, varyingparameter, True, True, varyingparametervalue <> "_Run" <> IntegerString[statisticalruncounter]];
+  , {fprescribed, startingf, endingf, finterval}, {statisticalruncounter, statisticalrunstart, statisticalrepetition, 1}
+  ]
+ ]
