@@ -1,8 +1,8 @@
 r[s_, p_] :=
  MapThread[
-  If[Abs[#1] <= (k0 + 1)/2, #2*\[CapitalDelta]t0*2 E^(-(energyconstant/4))*E^(-((energyconstant*#1^2)/(1 + k0)))*Cosh[#1*energyconstant],1] &, {s, Unitize[p]}]
+  If[Abs[#1] <= (k0 + 1)/2, #2*\[CapitalDelta]t0*E^(-((energyconstant*#1^2)/(1 + k0)))*Cosh[#1*energyconstant],1] &, {s, Unitize[p]}]
 
-g[s_, p_] := (1 - Unitize[p])*\[CapitalDelta]t0*kon/2*timeconstant*(Erf[(s + 0.5)*Sqrt[energyconstant]] - Erf[(s - 0.5)*Sqrt[energyconstant]])
+g[s_, p_] := (1 - Unitize[p])*\[CapitalDelta]t0*0.5 kon Sqrt[Pi/energyconstant]*timeconstant*(Erf[(s + 0.5)*Sqrt[energyconstant]] - Erf[(s - 0.5)*Sqrt[energyconstant]])
 
 neighbourtest[criterion_] :=
   Module[{n = 0},

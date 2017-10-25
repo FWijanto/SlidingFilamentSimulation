@@ -1,8 +1,8 @@
 detachmentrate[s_, p_] :=
- N[Unitize[p]]*2 E^(-(energyconstant/4))*
+ N[Unitize[p]]*
   E^(-((energyconstant*s^2)/(1 + k0)))*Cosh[s*energyconstant](*k^-*)
 
-attachmentrate[s_, p_] := (1. - N[Unitize[p]])*kon/2*
+attachmentrate[s_, p_] := (1. - N[Unitize[p]])*0.5 kon (Sqrt[Pi/energyconstant])*
   timeconstant*(Erf[(s + 0.5)*Sqrt[energyconstant]] -
     Erf[(s - 0.5)*Sqrt[energyconstant]])(*k^+*)
 
