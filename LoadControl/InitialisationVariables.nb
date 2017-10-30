@@ -15,6 +15,6 @@ With[{Nrealisation = 10000.(*\[Delta]=1;*)(*nm*),
 
   neighbourcriterion = 0.01
   },
- microparameters = {kon, timeconstant, k0, energyconstant, d0,
+ microparameters = {kon, k0, energyconstant, d0,
     neighbourcriterion};
  ]
