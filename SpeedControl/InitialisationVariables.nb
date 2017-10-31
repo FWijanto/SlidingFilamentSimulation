@@ -1,13 +1,7 @@
 With[{Nrealisation = 10000.(*\[Delta]=1;*)(*nm*),
   kon = 10.,(*kon=Subscript[k, on]/(Subscript[k, off]E^-Subscript[U,
   0]), Subscript[k, off]=10^-3 Hz, Subscript[k, on]=10^-2 Hz*)
-
-  timeconstant = 1., (*timeconstant=Subscript[k,
-  off]\[ExponentialE]^-Subscript[\[Beta]U, 0]*)
-  (*v=5;*) (*nm.s^-1*)
-
   k0 = 10., (*k0=k/\[Kappa], k en pN.nm^-1*)
-
   energyconstant = 2,(*energyconstant=\[Beta]\[Kappa]\[Delta]^2/
   2*)(*\[Beta]=4;*)
   d0 = .5, (*d0=d/\[Delta],
@@ -17,6 +11,6 @@ With[{Nrealisation = 10000.(*\[Delta]=1;*)(*nm*),
 \[CapitalDelta]t en s*)
   neighbourcriterion = 0.01
   },
- microparameters = {kon, timeconstant, k0, energyconstant, d0,
+ microparameters = {kon, k0, energyconstant, d0,
     neighbourcriterion};
  ]

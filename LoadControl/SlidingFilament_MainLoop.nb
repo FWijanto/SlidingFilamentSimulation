@@ -1,9 +1,8 @@
-SetAttributes[unidirectionaltractionexperimentloadcontrolled2,
+SetAttributes[unidirectionaltractionexperimentloadcontrolled,
   HoldFirst];
 unidirectionaltractionexperimentloadcontrolled[pathvectorname_, n_,
   fprescribed_, initialpvector_,
-  Nrealisation_, {konarg_, timeconstantarg_, k0arg_,
-   energyconstantarg_, d0arg_,
+  Nrealisation_, {konarg_, k0arg_, energyconstantarg_, d0arg_,
    neighbourcriterionarg_}(*microparameters*)] :=
 
  Module[{\[CapitalDelta]f, s, p, r1, nattached, numberofneighbours,
@@ -11,12 +10,10 @@ unidirectionaltractionexperimentloadcontrolled[pathvectorname_, n_,
    detachedpositionlist, ratelist, indexofnextevent,
    timeuntilnextevent, nexteventpick, attachmenttransitionratematrix,
    detachmentratelist, listofattachedstates, t = 0},
-  Block[{kon = konarg, timeconstant = timeconstantarg, k0 = k0arg,
-     energyconstant = energyconstantarg, d0 = d0arg,
-     neighbourcriterion = neighbourcriterionarg},
-    parametersforexport = {Nrealisation, kon, timeconstant, k0,
-      energyconstant, d0, neighbourcriterion, n, initialpvector,
-      fprescribed};
+  Block[{kon = konarg, k0 = k0arg, energyconstant = energyconstantarg,
+      d0 = d0arg, neighbourcriterion = neighbourcriterionarg},
+    parametersforexport = {Nrealisation, kon, k0, energyconstant, d0,
+      neighbourcriterion, n, initialpvector, fprescribed};
     numberofneighbours = neighbourtest[neighbourcriterion];
     listofattachedstates =
      Table[i, {i, -numberofneighbours, -1}]~
@@ -95,13 +92,15 @@ the farthest head which has gone by the Kramers validity range*)
                 Table[attachedpositionlist, {2*numberofneighbours +
                    1}]]],
               Flatten[
-               Table[listofattachedstates, {Length[attachedpositionlist]}]]}]~
-            Join~Transpose[{detachmentratelist[[
-               detachedpositionlist]], detachedpositionlist,
+               Table[listofattachedstates, {Length[
+                  attachedpositionlist]}]]}]~Join~
+            Transpose[{detachmentratelist[[detachedpositionlist]],
+              detachedpositionlist,
               ConstantArray[0., Length[detachedpositionlist]]}];
 
-          timeuntilnextevent =
-          -Log[RandomReal[]]/totalrate;(*generate random variate of exponential distribution with parameter total rate*)
+          timeuntilnextevent = -Log[RandomReal[]]/
+            totalrate;(*generate random variate of exponential \
+distribution with parameter total rate*)
 
           nexteventpick =
            RandomChoice[

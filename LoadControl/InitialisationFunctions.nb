@@ -2,8 +2,7 @@ detachmentrate[s_, p_] :=
  N[Unitize[p]]*2 E^(-(energyconstant/4))*
   E^(-((energyconstant*s^2)/(1 + k0)))*Cosh[s*energyconstant](*k^-*)
 
-attachmentrate[s_, p_] := (1. - N[Unitize[p]])*kon/2*
-  timeconstant*(Erf[(s + 0.5)*Sqrt[energyconstant]] -
+attachmentrate[s_, p_] := (1. - N[Unitize[p]])*kon/2*(Erf[(s + 0.5)*Sqrt[energyconstant]] -
     Erf[(s - 0.5)*Sqrt[energyconstant]])(*k^+*)
 
 neighbourtest[criterion_] :=
