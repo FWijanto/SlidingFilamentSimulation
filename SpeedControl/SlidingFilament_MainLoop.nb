@@ -2,25 +2,22 @@ SetAttributes[unidirectionaltractionexperimentspeedcontrolled,
   HoldFirst];
 unidirectionaltractionexperimentspeedcontrolled[pathvectorname_, n_,
   vprescribed_, initialpvector_, \[CapitalDelta]t0arg_,
-  Nrealisation_, {konarg_, timeconstantarg_, k0arg_,
-   energyconstantarg_, d0arg_,
+  Nrealisation_, {konarg_, k0arg_, energyconstantarg_, d0arg_,
    neighbourcriterionarg_}(*microparameters*)] :=
 
  Module[{s, r1, p, f, ftotal, nattached, t = 0},
-  Block[{kon = konarg, timeconstant = timeconstantarg, k0 = k0arg,
-     energyconstant = energyconstantarg,
-     d0 = d0arg, \[CapitalDelta]t0 = \[CapitalDelta]t0arg,
+  Block[{kon = konarg, k0 = k0arg, energyconstant = energyconstantarg,
+      d0 = d0arg, \[CapitalDelta]t0 = \[CapitalDelta]t0arg,
      neighbourcriterion = neighbourcriterionarg},
-    parametersforexport = {Nrealisation, kon, timeconstant, k0,
-      energyconstant, d0, \[CapitalDelta]t0, neighbourcriterion, n,
-      initialpvector, vprescribed};
+    parametersforexport = {Nrealisation, kon, k0, energyconstant,
+      d0, \[CapitalDelta]t0, neighbourcriterion, n, initialpvector,
+      vprescribed};
 
     s = Table[RandomReal[{-d0/2, d0/2}], {n}];
     p = Table[RandomChoice[initialpvector -> {0., 1.}], {n}];
     f = Total[
       (Table[1 - Unitize[p - i]
           , {i,
-
            Table[i, {i, 2 - neighbourtest[neighbourcriterion], -1,
               1}]~Join~
             Table[i, {i, 2, neighbourtest[neighbourcriterion]}]}
@@ -54,6 +51,7 @@ in opposite direction of traction.)}*)
              MapThread[Boole[#1 < #2] &, {r1, g[swrapped[s], p]}] +
             attachmentfunctionplus[s, p, r1] +
             attachmentfunctionminus[s, p, r1] -
+
             p*MapThread[
               Boole[#1 >= #2] &, {r1, cumulativeprob[s, p]}]*
              MapThread[

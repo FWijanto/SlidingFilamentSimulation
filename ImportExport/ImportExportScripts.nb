@@ -1,4 +1,4 @@
-(*dictionary for convenient access of parameters*)
+In[51]:= (*dictionary for convenient access of parameters*)
 parameterlookuptableloadcontrol[
    parametername_String] := <|
     "Nrealisation" -> parametersforexport[[1]],
@@ -20,7 +20,7 @@ parameterlookuptablespeedcontrol[
     "k0" -> parametersforexport[[4]],
     "energyconstant" -> parametersforexport[[5]],
     "d0" -> parametersforexport[[6]],
-    "\[CapitalDelta]t0" -> parametersforexport[[7]],
+    "Δt0" -> parametersforexport[[7]],
     "neighbourcriterion" -> parametersforexport[[8]],
     "n" -> parametersforexport[[9]],
     "initialpvector" -> parametersforexport[[10]],
@@ -46,8 +46,8 @@ or not. Value is True or False*), optionalfileidentifier_] :=
       "initialpvector (pdetached, pattached)", varyingparameter}]];
 
    varyingparametervalue =
-    IntegerString[Round[parameterlookuptableloadcontrol[varyingparameter]]];
-   columnlength = Round[parameterlookuptableloadcontrol["n"]];
+    IntegerString[Round[parameterlookuptable[varyingparameter]]];
+   columnlength = Round[parameterlookuptable["n"]];
 
    Export[
     "time_" <>
@@ -95,12 +95,13 @@ or not. Value is True or False*), optionalfileidentifier_] :=
     If[identifieractivationflag == True, optionalfileidentifier] <>
     ".dat", Prepend[{parametersforexport}, {"Nrealisation", "kon",
      "timeconstant", "k0", "energyconstant", "d0",
-     "\[CapitalDelta]t0", "neighbourcriterion", "n",
+     "Δt0", "neighbourcriterion", "n",
      "initialpvector (pdetached, pattached)", varyingparameter}]];
 
   varyingparametervalue =
-   IntegerString[Round[parameterlookuptablespeedcontrol[varyingparameter]]];
-  columnlength = Round[parameterlookuptablespeedcontrol["n"]];
+   IntegerString[Round[parameterlookuptable[varyingparameter]]];
+  columnlength = Round[parameterlookuptable["n"]];
+
 
   Export["time_" <>
     If[varyingparameteractivationflag == True, varyingparameter, ""] <>
@@ -128,6 +129,7 @@ or not. Value is True or False*), optionalfileidentifier_] :=
      ""] <> ".dat",
    Prepend[pathvectorname[[2, 4]],
     PadRight[{"ftotal"}, columnlength, Null]]];
+]
 
     (*------------------------------------------------------------------------*)
 (*helper function to identify level specification for different kinds of imported parameters*)
