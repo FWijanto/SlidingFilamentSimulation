@@ -1,4 +1,4 @@
-In[51]:= (*dictionary for convenient access of parameters*)
+(*dictionary for convenient access of parameters*)
 parameterlookuptableloadcontrol[
    parametername_String] := <|
     "Nrealisation" -> parametersforexport[[1]],
