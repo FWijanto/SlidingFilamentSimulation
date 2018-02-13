@@ -3,28 +3,26 @@ parameterlookuptableloadcontrol[
    parametername_String] := <|
     "Nrealisation" -> parametersforexport[[1]],
     "kon" -> parametersforexport[[2]],
-    "timeconstant" -> parametersforexport[[3]],
-    "k0" -> parametersforexport[[4]],
-    "energyconstant" -> parametersforexport[[5]],
-    "d0" -> parametersforexport[[6]],
-    "neighbourcriterion" -> parametersforexport[[7]],
-    "n" -> parametersforexport[[8]],
-    "initialpvector" -> parametersforexport[[9]],
-    "fprescribed" -> parametersforexport[[10]]|>[parametername];
+    "k0" -> parametersforexport[[3]],
+    "energyconstant" -> parametersforexport[[4]],
+    "d0" -> parametersforexport[[5]],
+    "neighbourcriterion" -> parametersforexport[[6]],
+    "n" -> parametersforexport[[7]],
+    "initialpvector" -> parametersforexport[[8]],
+    "fprescribed" -> parametersforexport[[9]]|>[parametername];
 
 parameterlookuptablespeedcontrol[
    parametername_String] := <|
     "Nrealisation" -> parametersforexport[[1]],
     "kon" -> parametersforexport[[2]],
-    "timeconstant" -> parametersforexport[[3]],
-    "k0" -> parametersforexport[[4]],
-    "energyconstant" -> parametersforexport[[5]],
-    "d0" -> parametersforexport[[6]],
-    "Δt0" -> parametersforexport[[7]],
-    "neighbourcriterion" -> parametersforexport[[8]],
-    "n" -> parametersforexport[[9]],
-    "initialpvector" -> parametersforexport[[10]],
-    "vprescribed" -> parametersforexport[[11]]|>[parametername];
+    "k0" -> parametersforexport[[3]],
+    "energyconstant" -> parametersforexport[[4]],
+    "d0" -> parametersforexport[[5]],
+    "Δt0" -> parametersforexport[[6]],
+    "neighbourcriterion" -> parametersforexport[[7]],
+    "n" -> parametersforexport[[8]],
+    "initialpvector" -> parametersforexport[[9]],
+    "vprescribed" -> parametersforexport[[10]]|>[parametername];
 
     (*Export functions*)
 
@@ -41,13 +39,13 @@ or not. Value is True or False*), optionalfileidentifier_] :=
     "ParameterValues" <>
      If[identifieractivationflag == True, optionalfileidentifier] <>
      ".dat", Prepend[{parametersforexport}, {"Nrealisation", "kon",
-      "timeconstant", "k0", "energyconstant", "d0",
+      "k0", "energyconstant", "d0",
       "neighbourcriterion", "n",
       "initialpvector (pdetached, pattached)", varyingparameter}]];
 
    varyingparametervalue =
-    IntegerString[Round[parameterlookuptable[varyingparameter]]];
-   columnlength = Round[parameterlookuptable["n"]];
+    IntegerString[Round[parameterlookuptableloadcontrol[varyingparameter]]];
+   columnlength = Round[parameterlookuptableloadcontrol["n"]];
 
    Export[
     "time_" <>
@@ -94,13 +92,13 @@ or not. Value is True or False*), optionalfileidentifier_] :=
   Export["ParameterValues" <>
     If[identifieractivationflag == True, optionalfileidentifier] <>
     ".dat", Prepend[{parametersforexport}, {"Nrealisation", "kon",
-     "timeconstant", "k0", "energyconstant", "d0",
+     "k0", "energyconstant", "d0",
      "Δt0", "neighbourcriterion", "n",
      "initialpvector (pdetached, pattached)", varyingparameter}]];
 
   varyingparametervalue =
-   IntegerString[Round[parameterlookuptable[varyingparameter]]];
-  columnlength = Round[parameterlookuptable["n"]];
+   IntegerString[Round[parameterlookuptablespeedcontrol[varyingparameter]]];
+  columnlength = Round[parameterlookuptablespeedcontrol["n"]];
 
 
   Export["time_" <>
