@@ -36,7 +36,8 @@ or not. Value is True or False*), optionalfileidentifier_] :=
   Module[{varyingparametervalue, columnlength},
    SetDirectory[exportlocation];
    Export[
-    "ParameterValues" <>
+    "ParameterValues_" <>
+    If[varyingparameteractivationflag == True, varyingparameter, ""] <>
      If[identifieractivationflag == True, optionalfileidentifier] <>
      ".dat", Prepend[{parametersforexport}, {"Nrealisation", "kon",
       "k0", "energyconstant", "d0",
@@ -89,7 +90,8 @@ or not. Value is True or False*), optionalfileidentifier_] :=
 
  Module[{varyingparametervalue, columnlength},
   SetDirectory[exportlocation];
-  Export["ParameterValues" <>
+  Export["ParameterValues_" <>
+  If[varyingparameteractivationflag == True, varyingparameter, ""] <>
     If[identifieractivationflag == True, optionalfileidentifier] <>
     ".dat", Prepend[{parametersforexport}, {"Nrealisation", "kon",
      "k0", "energyconstant", "d0",
