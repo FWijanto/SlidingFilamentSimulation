@@ -157,3 +157,23 @@ can be looked up*)] := Module[{},
     ]
    , 2]
   ]
+  	
+  	(*------------------------------------------------------------------------*)
+  (*Function which expands into a simulation output file string. Takes as argument the desired output type (e.g. time, f_total...) and run number.*)
+
+speedfilename[outputtype_String,prescribedvalue_,runnumber_]:=
+Switch[outputtype,
+"ftotal","ftotal_vprescribed_"<>ToString[prescribedvalue]<>"_Run"<>ToString[runnumber]<>".dat",
+"time","time_vprescribed_"<>ToString[prescribedvalue]<>"_Run"<>ToString[runnumber]<>".dat",
+"p","p_vprescribed_"<>ToString[prescribedvalue]<>"_Run"<>ToString[runnumber]<>".dat",
+"f","f_vprescribed_"<>ToString[prescribedvalue]<>"_Run"<>ToString[runnumber]<>".dat",
+"ParameterValues","ParameterValues_vprescribed_"<>ToString[prescribedvalue]<>"_Run"<>ToString[runnumber]<>".dat"
+]
+loadfilename[outputtype_String,prescribedvalue_,runnumber_]:=
+Switch[outputtype,
+"ftotal","ftotal_fprescribed_"<>ToString[prescribedvalue]<>"_Run"<>ToString[runnumber]<>".dat",
+"time","time_fprescribed_"<>ToString[prescribedvalue]<>"_Run"<>ToString[runnumber]<>".dat",
+"p","p_fprescribed_"<>ToString[prescribedvalue]<>"_Run"<>ToString[runnumber]<>".dat",
+"f","f_fprescribed_"<>ToString[prescribedvalue]<>"_Run"<>ToString[runnumber]<>".dat",
+"ParameterValues","ParameterValues_fprescribed_"<>ToString[prescribedvalue]<>"_Run"<>ToString[runnumber]<>".dat"
+]
