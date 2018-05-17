@@ -149,7 +149,7 @@ can be looked up*)] := Module[{},
     Do[
      Sow[
        Flatten[
-        Rest[First[Import[parameterlist[[i]]]]]
+        Rest[Import[parameterlist[[i]]]]
         , levelspecforparametertype[parameterlist[[i]]]]
        ];
      , {i, Length[parameterlist]}];
